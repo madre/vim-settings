@@ -1,4 +1,3 @@
-""""""""""""""""""""""VUNDLE PLUGIN""""""""""""""""""""
 
 " 不兼容vi
 set nocompatible
@@ -27,7 +26,8 @@ Plugin 'walm/jshint.vim'
 Plugin 'moll/vim-node'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'Yggdroot/indentLine'
-Plugin 'nvie/vim-flake8'
+" Plugin 'nvie/vim-flake8'
+Plugin 'scrooloose/syntastic'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'axiaoxin/vim-json-line-format'
 Plugin 'axiaoxin/favorite-vim-colorscheme'
@@ -99,7 +99,8 @@ autocmd! bufwritepost .vimrc source %
 set autoread
 
 " yy直接复制到系统剪切板（For macvim）
-"set clipboard=unnamed
+set pastetoggle=<F2>
+set clipboard=unnamed
 
 " 高亮搜索命中的文本
 set hlsearch
@@ -257,14 +258,20 @@ let g:NERDSpaceDelims=1
 
 " NERDTREE
 " 不显示的文件
-let NERDTreeIgnore=['\.pyc$', '\~$']
+let NERDTreeIgnore=['\.pyc$']
 " show nerdtree when starts up
-"autocmd vimenter * NERDTree
+" autocmd vimenter * NERDTree
+map <C-n> :NERDTreeToggle<CR>
 " 退出最后一个buff时也退出nerdtree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 
+
 " CtrlP
 let g:ctrlp_show_hidden = 1
+let g:ctrlp_max_height = 30
+set wildignore+=*.pyc
+set wildignore+=*_build/*
+set wildignore+=*/coverage/*
 
 "Ctrl-X Ctrl-U emoji补全
 set completefunc=emoji#complete
@@ -287,10 +294,19 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 autocmd FileType python setlocal completeopt-=preview
 let g:jedi#completions_command = "<C-n>"
 
-" flake8
-let g:flake8_show_in_file = 1
-let g:flake8_show_in_gutter = 1
-autocmd! BufRead,BufWritePost *.py call Flake8()
+
+" syntastic: python synctax cheacking hacks
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+highlight SyntasticError guibg=#2f0000
+let g:syntastic_python_checkers = ['flake8', 'pylint']
+let g:syntastic_python_pylint_args = "--load-plugins pylint_django"
+let g:syntastic_python_pylint_post_args = '--msg-template="{path}:{line}:{column}:{C}: [{symbol} {msg_id}] {msg}"'
 
 " gitgutter
 let g:gitgutter_sign_modified = '*'
